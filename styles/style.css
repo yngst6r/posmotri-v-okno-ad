@@ -191,6 +191,55 @@ ol {
   inline-size: 100%;
 }
 
+.content__list-item {
+  padding-inline: 3px;
+}
+
+.content__card-link {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+}
+
+.content__video-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.content__video-card-description-container {
+  flex-grow: 1;
+  max-inline-size: 196px;
+}
+
+.content__video-card-title {
+  overflow: hidden;
+  font-family: Oswald, sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.content__video-card-description {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 18px;
+  line-height: 0.9;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+}
+
+.content__video-card-thumbnail {
+  min-inline-size: 194px;
+  block-size: 103px;
+  object-fit: cover;
+  object-position: center;
+}
+
 /* Кастомный скроллбар */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
