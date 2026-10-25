@@ -212,11 +212,14 @@ ol {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 5px;
 }
 
 .content__video-card-description-container {
   flex-grow: 1;
+  min-inline-size: 0;
   max-inline-size: 196px;
+  padding-block-start: 2px;
 }
 
 .content__video-card-title {
@@ -228,6 +231,7 @@ ol {
   text-transform: uppercase;
   text-overflow: ellipsis;
   white-space: nowrap;
+  padding-block-end: 5px;
 }
 
 .content__video-card-description {
@@ -241,6 +245,7 @@ ol {
 }
 
 .content__video-card-thumbnail {
+  inline-size: 194px;
   min-inline-size: 194px;
   block-size: 103px;
   object-fit: cover;
