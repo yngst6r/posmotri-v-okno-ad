@@ -240,6 +240,36 @@ ol {
   object-position: center;
 }
 
+.search-form__textfield:focus,
+.button:focus,
+.content__card-link:focus {
+  outline: none;
+}
+
+.search-form__label:has(:focus-visible),
+.button:focus-visible,
+.content__card-link:focus-visible {
+  outline: 1px solid #fff;
+  outline-offset: 1px;
+}
+
+.search-form__checkbox-list .search-form__label,
+.content__card-link {
+  cursor: pointer;
+}
+
+.search-form__checkbox-list .search-form__label:hover,
+.button:hover,
+.content__card-link:hover {
+  text-decoration: underline;
+}
+
+.button:active,
+.content__card-link:active,
+.content__card-link_current {
+  background-color: #545050;
+}
+
 /* Кастомный скроллбар */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
