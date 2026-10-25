@@ -130,14 +130,21 @@ ol {
   inline-size: fit-content;
 }
 
+.search-form__label-text {
+  line-height: 0.9;
+}
+
 .search-form__textfield {
   inline-size: 225px;
+  padding: 1px 0;
   border: none;
   border-block: 1px solid currentColor;
   color: #fff;
   font: inherit;
+  line-height: 1;
   appearance: none;
   background-color: transparent;
+  cursor: text;
 }
 
 .search-form__textfield::placeholder {
