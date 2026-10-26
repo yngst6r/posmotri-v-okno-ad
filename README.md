@@ -26,4 +26,4 @@
 
 ## Демо
 
-GitHub Pages будет включён после успешного запуска тестов.
+[Открыть проект на GitHub Pages](https://yngst6r.github.io/posmotri-v-okno-ad/)
