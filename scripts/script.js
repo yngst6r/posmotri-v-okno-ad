@@ -3,6 +3,62 @@ const preloaderWaitindTime = 1200;
 const cardsOnPage = 5;
 const BASE_URL = 'https://v-content.practicum-team.ru';
 const endpoint = `${BASE_URL}/api/videos?pagination[pageSize]=${cardsOnPage}&`;
+const requestTimeout = 5000;
+const videoReadyTimeout = 8000;
+const fallbackVideos = {
+  results: [
+    {
+      id: 'fallback-1',
+      city: 'Санкт-Петербург',
+      description: 'Цветы на городском ветру',
+      time_of_day: 'morning',
+      video: {
+        url: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      },
+      poster: { url: 'https://picsum.photos/seed/saint-petersburg/960/540' },
+      thumbnail: { url: 'https://picsum.photos/seed/saint-petersburg/640/360' },
+    },
+    {
+      id: 'fallback-2',
+      city: 'Москва',
+      description: 'Движение большого города',
+      time_of_day: 'afternoon',
+      video: { url: 'https://www.w3schools.com/html/mov_bbb.mp4' },
+      poster: { url: 'https://picsum.photos/seed/moscow/960/540' },
+      thumbnail: { url: 'https://picsum.photos/seed/moscow/640/360' },
+    },
+    {
+      id: 'fallback-3',
+      city: 'Казань',
+      description: 'Вечерняя прогулка',
+      time_of_day: 'night',
+      video: { url: 'https://media.w3.org/2010/05/sintel/trailer.mp4' },
+      poster: { url: 'https://picsum.photos/seed/kazan/960/540' },
+      thumbnail: { url: 'https://picsum.photos/seed/kazan/640/360' },
+    },
+    {
+      id: 'fallback-4',
+      city: 'Сочи',
+      description: 'Город у моря',
+      time_of_day: 'morning',
+      video: {
+        url: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      },
+      poster: { url: 'https://picsum.photos/seed/sochi/960/540' },
+      thumbnail: { url: 'https://picsum.photos/seed/sochi/640/360' },
+    },
+    {
+      id: 'fallback-5',
+      city: 'Владивосток',
+      description: 'Вид на далёкий горизонт',
+      time_of_day: 'afternoon',
+      video: { url: 'https://www.w3schools.com/html/mov_bbb.mp4' },
+      poster: { url: 'https://picsum.photos/seed/vladivostok/960/540' },
+      thumbnail: { url: 'https://picsum.photos/seed/vladivostok/640/360' },
+    },
+  ],
+  pagination: { page: 1, pageCount: 1 },
+};
 
 /* ЭЛЕМЕНТЫ СТРАНИЦЫ */
 const cardsList = document.querySelector('.content__list');
@@ -59,7 +115,7 @@ form.onsubmit = (e) => {
 
 async function mainMechanics(endpoint) {
   try {
-    const data = await (await fetch(endpoint)).json();
+    const data = await fetchVideos(endpoint);
     cardsOnPageState = data.results;
 
     if (!data?.results?.[0]) {
@@ -133,8 +189,49 @@ async function delay(ms) {
 
 async function waitForReadyVideo(video) {
   return await new Promise((resolve) => {
-    video.oncanplaythrough = resolve;
+    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      resolve(true);
+      return;
+    }
+
+    const finish = (isReady) => {
+      clearTimeout(timer);
+      video.removeEventListener('loadeddata', onReady);
+      video.removeEventListener('canplaythrough', onReady);
+      video.removeEventListener('error', onError);
+      resolve(isReady);
+    };
+    const onReady = () => finish(true);
+    const onError = () => finish(false);
+    const timer = setTimeout(() => finish(false), videoReadyTimeout);
+
+    video.addEventListener('loadeddata', onReady, { once: true });
+    video.addEventListener('canplaythrough', onReady, { once: true });
+    video.addEventListener('error', onError, { once: true });
   });
+}
+
+// Используем резервные данные, если учебный API временно недоступен.
+async function fetchVideos(url) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), requestTimeout);
+
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.warn('Учебный API недоступен, используются резервные данные.', error);
+    return fallbackVideos;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function resolveMediaUrl(baseUrl, mediaUrl) {
+  return new URL(mediaUrl, baseUrl).href;
 }
 
 // Устанавливает прелоадер на время загрузки данных ✅
@@ -164,7 +261,7 @@ function appendCards({ baseUrl, dataArray, cardTmp, container }) {
       el.description;
     node
       .querySelector('.content__video-card-thumbnail')
-      .setAttribute('src', `${baseUrl}${el.thumbnail.url}`);
+      .setAttribute('src', resolveMediaUrl(baseUrl, el.thumbnail.url));
     node
       .querySelector('.content__video-card-thumbnail')
       .setAttribute('alt', el.description);
@@ -175,8 +272,8 @@ function appendCards({ baseUrl, dataArray, cardTmp, container }) {
 
 // Устанавливет внужное видео в контейнер ✅
 function setVideo({ baseUrl, video, videoUrl, posterUrl }) {
-  video.setAttribute('src', `${baseUrl}${videoUrl}`);
-  video.setAttribute('poster', `${baseUrl}${posterUrl}`);
+  video.setAttribute('src', resolveMediaUrl(baseUrl, videoUrl));
+  video.setAttribute('poster', resolveMediaUrl(baseUrl, posterUrl));
   console.log('Подставил видео в основной блок');
 }
 
