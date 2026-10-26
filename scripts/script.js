@@ -224,26 +224,10 @@ async function fetchVideos(url) {
     return await response.json();
   } catch (error) {
     console.warn('Учебный API недоступен, используются резервные данные.', error);
-    return filterFallbackVideos(url);
+    return fallbackVideos;
   } finally {
     clearTimeout(timer);
   }
-}
-
-function filterFallbackVideos(url) {
-  const searchParams = new URL(url).searchParams;
-  const city = searchParams.get('filters[city][$containsi]')?.toLowerCase();
-  const times = searchParams.getAll('filters[time_of_day][$eqi]');
-  const results = fallbackVideos.results.filter((video) => {
-    const matchesCity = !city || video.city.toLowerCase().includes(city);
-    const matchesTime = !times.length || times.includes(video.time_of_day);
-    return matchesCity && matchesTime;
-  });
-
-  return {
-    results,
-    pagination: { page: 1, pageCount: 1 },
-  };
 }
 
 function resolveMediaUrl(baseUrl, mediaUrl) {
